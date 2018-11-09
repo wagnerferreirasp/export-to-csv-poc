@@ -2,8 +2,8 @@ package com.example.exporttocsvpoc;
 
 import com.example.exporttocsvpoc.search.CustomRolesSearchResult;
 import com.example.exporttocsvpoc.search.UserSearchResult;
-import com.example.types.TicketFormPut;
-import com.example.types.TicketFormsSearch;
+import com.json.generated.TicketFormPut;
+import com.json.generated.TicketFormsSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -14,7 +14,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -28,9 +27,6 @@ public class ZendeskService {
     String ENDPOINT_LIST_TICKET_FORMS;
     @Value("/api/v2/custom_roles.json")
     String ENDPOINT_CUSTOM_ROLES;
-
-    @Value("${server.url}")
-    String baseUrl;
 
     @Autowired
     RestTemplate restTemplate;

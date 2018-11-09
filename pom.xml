@@ -73,7 +73,7 @@
                     <sourceType>json</sourceType>
                     <useBigIntegers>true</useBigIntegers>
 					<sourceDirectory>${basedir}/src/main/resources/schema</sourceDirectory>
-					<targetPackage>com.example.types</targetPackage>
+					<targetPackage>com.json.generated</targetPackage>
 				</configuration>
 				<executions>
 					<execution>
