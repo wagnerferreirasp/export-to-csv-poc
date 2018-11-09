@@ -1,0 +1,16 @@
+{
+  "ticket_form": {
+    "id": 47,
+    "name": "Snowboard Problem",
+    "ticket_field_ids": [
+      2,
+      4,
+      5,
+      10,
+      100,
+      101,
+      102,
+      200
+    ]
+  }
+}

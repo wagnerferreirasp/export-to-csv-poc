@@ -14,7 +14,7 @@ public class UserSearched {
     Boolean active;
     UserFieldsSearched user_fields;
 
-    public UserCsv toUser() {
+    public UserCsv toUserCsv() {
         UserCsv userCsv = new UserCsv();
         userCsv.setId(this.id);
         userCsv.setNome(this.name);

@@ -2,48 +2,82 @@ package com.example.exporttocsvpoc;
 
 import com.example.exporttocsvpoc.search.CustomRolesSearchResult;
 import com.example.exporttocsvpoc.search.UserSearchResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.types.TicketFormPut;
+import com.example.types.TicketFormsSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ZendeskService {
+    @Value("/api/v2/search.json?query={query}&page={page}")
+    String ENDPOINT_SEARCH_WITH_PAGE;
+    @Value("/api/v2/ticket_forms/{id}.json")
+    String ENDPOINT_UPDATE_TICKET_FORMS;
+    @Value("/api/v2/ticket_forms.json")
+    String ENDPOINT_LIST_TICKET_FORMS;
+    @Value("/api/v2/custom_roles.json")
+    String ENDPOINT_CUSTOM_ROLES;
+
     @Value("${server.url}")
     String baseUrl;
-    @Value("${endpoints.busca1}")
-    String endpointBusca1;
-    @Value("${endpoints.customRoles}")
-    String endpointCustomRoles;
 
     @Autowired
     RestTemplate restTemplate;
 
-    Logger logger = LoggerFactory.getLogger(ZendeskService.class);
+    public TicketFormsSearch ticketForms() {
+        return restTemplate
+                .getForEntity(ENDPOINT_LIST_TICKET_FORMS, TicketFormsSearch.class)
+                .getBody();
+    }
 
     @Async
-    CompletableFuture<UserSearchResult> buscaUsuarios(int page) {
-        logger.info("Buscando página " + page);
-        String url = baseUrl + endpointBusca1 + "&page=" + page;
-        ResponseEntity<UserSearchResult> resultResponseEntity = restTemplate.getForEntity(URI.create(url), UserSearchResult.class);
+    CompletableFuture<UserSearchResult> buscaUsuarios(String query, int page) {
+        HashMap<String, Object> variables = new HashMap<>();
+        variables.put("query", query);
+        variables.put("page", 1);
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString(ENDPOINT_SEARCH_WITH_PAGE).build();
+        uriComponents = uriComponents.expand(variables);
+        ResponseEntity<UserSearchResult> resultResponseEntity = restTemplate.getForEntity(uriComponents.toString(), UserSearchResult.class);
         return CompletableFuture.completedFuture(resultResponseEntity.getBody());
     }
 
     public CustomRolesSearchResult buscaFuncoes() {
-        String url = baseUrl + endpointCustomRoles;
-        return restTemplate.getForEntity(URI.create(url), CustomRolesSearchResult.class).getBody();
+        return restTemplate
+                .getForEntity(ENDPOINT_CUSTOM_ROLES, CustomRolesSearchResult.class)
+                .getBody();
     }
 
-    public Long getCountBusca1() {
-        String url = baseUrl + endpointBusca1;
-        ResponseEntity<UserSearchResult> resultResponseEntity = restTemplate.getForEntity(URI.create(url), UserSearchResult.class);
-        return resultResponseEntity.getBody().getCount();
+    @Async
+    public void mudaTicketForm(TicketFormPut ticketFormPut) {
+        HttpEntity<TicketFormPut> entity = new HttpEntity<TicketFormPut>(ticketFormPut);
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString(ENDPOINT_UPDATE_TICKET_FORMS).build();
+        restTemplate.put(
+                uriComponents.expand(ticketFormPut.getTicketForm().getId()).toString(),
+                entity
+        );
+    }
+
+    public Long getCountDaBuscaDeUsuarios(String query) {
+        HashMap<String, Object> variables = new HashMap<>();
+        variables.put("query", query);
+        variables.put("page", 1);
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString(ENDPOINT_SEARCH_WITH_PAGE).build();
+        uriComponents = uriComponents.expand(variables);
+
+        return restTemplate
+                .getForEntity(uriComponents.toString(), UserSearchResult.class)
+                .getBody()
+                .getCount();
     }
 }
