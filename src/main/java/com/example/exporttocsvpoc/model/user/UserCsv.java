@@ -1,4 +1,4 @@
-package com.example.exporttocsvpoc;
+package com.example.exporttocsvpoc.model.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
